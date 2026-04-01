@@ -1,64 +1,79 @@
-# transformer drills
+# ML drills
 
-Fill-in-the-blank coding drills.
+Fill-in-the-blank coding drills for learning ML implementations.
 
 ## setup
 
-Put your Python files in `drills/`. Any functions or classes in there become drillable.
+Put your Python implementations in `drills/`. Any top-level class or function becomes drillable.
 
 ```
-drills/
-  attention.py       ← your MHA, sdp_attention, etc.
-  transformer.py     ← your TransformerBlock, etc.
+transformer_drills/
+  drills/
+    attention.py
+    transformer_block.py
+    ...              ← add your own files here too
+  drill.py
+  drill_core.py
+  eval_work.py
 ```
 
-## generate drills
+## running
 
 ```bash
-# 1 drill, mask 40% of lines, with guidance hints
-python drill.py --mask 0.4 --guidance
-
-# 5 drills from a specific file
-python drill.py --mask 0.4 --num 5 --file attention.py
-
-# drill a specific function, mask exactly 3 lines
-python drill.py --mask 3 --function MultiHeadAttention
-
-# hard mode: no hints, mask 60%
-python drill.py --mask 0.6 --num 3
+python drill.py
 ```
 
-**`--mask`**: if < 1, treats as a fraction (0.5 = 50% of lines). If >= 1, masks that many lines exactly.  
-**`--guidance`**: masked lines show `# code here`. Without it, lines are just blank.
+That's it. A browser window opens automatically at `http://localhost:7234`.
 
-Generated files land in `todo_exercises/todo_1.py`, `todo_2.py`, etc.
+## using the UI
 
-## do the drill
+**Sidebar (left panel)**
 
-Open a todo file, fill in the blanks. The top of each file tells you where it came from:
+| Control | What it does |
+|---|---|
+| Exercise | Pick a specific file + function/class, or leave on *Random* |
+| Mask % | Percentage of code lines to blank out |
+| Guidance hints | When on, blanks show `# code here`; when off, lines are completely empty |
+| Generate | Creates a new exercise with the current settings |
 
-```python
-# source: drills/attention.py::MultiHeadAttention
-# masked: 4 line(s)
-```
+**Editor (main panel)**
 
-## check your work
+- Blank lines have a blue left border and an inline input field
+- Indentation is preserved — just type the code
+- **Tab** / **Shift+Tab** moves between blanks
+- **Ctrl+Enter** (or the Evaluate button) checks your answers
 
-```bash
-# check all todo files
-python eval_work.py
+**Results**
 
-# check a specific file
-python eval_work.py todo_exercises/todo_1.py
+- Correct blanks turn green
+- Wrong blanks turn red with a strikethrough, and the correct answer appears on the line below — right in context
+- Score shows in the sidebar
 
-# show correct answers next to wrong lines
-python eval_work.py --show-answers
-```
+## example for what's in drills/
 
-## workflow
+| File | Contents |
+|---|---|
+| `attention.py` | Masks, scaled dot-product attention, MHA, cross-attention |
+| `attention_variants.py` | Multi-query attention, grouped-query attention, KV cache |
+| `positional.py` | Sinusoidal encoding, learned embeddings, RoPE |
+| `normalization.py` | LayerNorm, RMSNorm, BatchNorm |
+| `feedforward.py` | FFN, GatedFFN (SwiGLU / GeGLU) |
+| `transformer_block.py` | Pre-norm block, post-norm block, decoder block |
+| `architectures.py` | TransformerEncoder, TransformerDecoder, EncoderDecoder, GPT, BERT |
+| `recurrent.py` | RNNCell, LSTMCell, RNN, LSTM |
+| `losses_and_activations.py` | Softmax, swish, GELU, SiLU, cross-entropy, focal loss |
+| `moe.py` | Switch MoE (top-1), Soft MoE (top-k) |
+| `contrastive.py` | InfoNCE, NT-Xent (SimCLR), CLIP loss, dual encoder |
+| `convolutions.py` | Residual block, simple CNN (Conv2d), TCN (Conv1d + dilation) |
+| `classical_ml.py` | Linear regression, logistic regression, precision/recall/F1, k-means |
+| `distributed.py` | Data parallelism, model parallelism, pipeline parallelism |
+| `generative.py` | Autoencoder, VAE, GAN, straight-through estimator, VQ-VAE |
 
-1. Add your implementations to `drills/`
-2. Run `drill.py` to generate a TODO
-3. Fill in the blanks (no peeking)
-4. Run `eval_work.py --show-answers` to check
-5. Repeat after 3 days, 1 week, 2 weeks
+
+## suggested workflow
+
+1. Start with 5-10% mask and guidance on — learn the structure
+2. Increase to 20–50% once the skeleton feels familiar
+3. Turn guidance off — now you have to remember what's missing
+4. Hit 100% mask on individual functions for blank-slate practice
+5. Repeat the same function after 3 days, 1 week, 2 weeks

@@ -2,11 +2,7 @@ import ast
 import os
 import sys
 import argparse
-
-
-def read_file(filepath):
-    with open(filepath, "r") as f:
-        return f.readlines()
+from drill_core import read_file
 
 
 def parse_metadata(lines):
