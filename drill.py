@@ -93,9 +93,17 @@ html,body { height:100%; background:var(--bg); color:var(--text); font-family:va
   display:none;
 }
 .score-box.on { display:block; }
+.score-top { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:6px; }
 .score-num { font-family:var(--font-code); font-size:26px; font-weight:600; color:var(--text); }
 .score-num.perfect { color:var(--green); }
-.score-sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.score-sub { font-size:11px; color:var(--text-muted); margin-top:1px; }
+.score-meta { font-size:11px; color:var(--text-dim); margin-top:6px; }
+.btn-reset {
+  background:transparent; border:1px solid var(--border); color:var(--text-muted);
+  border-radius:var(--radius); font-family:var(--font-ui); font-size:11px;
+  padding:3px 10px; cursor:pointer; transition:border-color .15s,color .15s;
+}
+.btn-reset:hover { border-color:var(--red); color:var(--red); }
 
 /* editor */
 .editor { flex:1; display:flex; flex-direction:column; overflow:hidden; }
@@ -226,8 +234,12 @@ html,body { height:100%; background:var(--bg); color:var(--text); font-family:va
       <button class="btn-gen" id="gen-btn">Generate Exercise →</button>
     </div>
     <div class="score-box" id="score-box">
-      <div class="score-num" id="score-num">—</div>
-      <div class="score-sub" id="score-sub">lines correct</div>
+      <div class="score-top">
+        <div class="score-num" id="score-num">—</div>
+        <button class="btn-reset" id="reset-btn">reset</button>
+      </div>
+      <div class="score-sub" id="score-sub">session score</div>
+      <div class="score-meta" id="score-meta"></div>
     </div>
   </aside>
 
@@ -252,6 +264,14 @@ html,body { height:100%; background:var(--bg); color:var(--text); font-family:va
 
 <script>
 let ex = null;
+let session = {correct: 0, total: 0, exercises: 0, evaluated: false};
+
+function resetSession() {
+  session = {correct: 0, total: 0, exercises: 0, evaluated: false};
+  document.getElementById('score-box').classList.remove('on');
+}
+
+document.getElementById('reset-btn').addEventListener('click', resetSession);
 
 async function loadItems() {
   const r = await fetch('/api/items');
@@ -295,8 +315,8 @@ async function generate() {
     const data = await r.json();
     if (data.error) { alert(data.error); return; }
     ex = data;
+    session.evaluated = false;
     render(ex);
-    document.getElementById('score-box').classList.remove('on');
   } catch(e) { alert(e); }
   finally { btn.textContent = 'Generate Exercise →'; btn.disabled = false; }
 }
@@ -422,12 +442,24 @@ function showResults(res) {
   });
 
   const [got, total] = res.score.split('/').map(Number);
-  const box = document.getElementById('score-box');
-  const num = document.getElementById('score-num');
-  const sub = document.getElementById('score-sub');
-  num.textContent = res.score;
-  num.className = 'score-num' + (res.all_correct ? ' perfect' : '');
-  sub.textContent = res.all_correct ? 'perfect!' : `of ${total} correct`;
+
+  if (!session.evaluated) {
+    session.correct  += got;
+    session.total    += total;
+    session.exercises += 1;
+    session.evaluated = true;
+  }
+
+  const box  = document.getElementById('score-box');
+  const num  = document.getElementById('score-num');
+  const sub  = document.getElementById('score-sub');
+  const meta = document.getElementById('score-meta');
+
+  const pct = session.total > 0 ? Math.round(session.correct / session.total * 100) : 0;
+  num.textContent = `${session.correct}/${session.total}`;
+  num.className = 'score-num' + (pct === 100 && session.exercises > 0 ? ' perfect' : '');
+  sub.textContent = `${pct}%  correct this session`;
+  meta.textContent = `${session.exercises} exercise${session.exercises === 1 ? '' : 's'}  ·  last: ${res.score}`;
   box.classList.add('on');
 
   const first = document.querySelector('.cl.no');
