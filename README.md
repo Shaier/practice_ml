@@ -2,6 +2,9 @@
 
 Fill-in-the-blank coding drills for learning ML implementations.
 
+<img width="1680" height="903" alt="image" src="https://github.com/user-attachments/assets/f9eea42d-74f9-4170-a212-615379dcb49c" />
+
+
 ## setup
 
 Put your Python implementations in `drills/`. Any top-level class or function becomes drillable.
