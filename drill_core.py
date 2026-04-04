@@ -5,7 +5,7 @@ import uuid
 from typing import Dict, List, Optional
 
 _COMMENT_PREFIXES = ("#", '"""', "'''", '"', "'", "`")
-_STRUCTURAL_PREFIXES = ("def ", "async def ", "class ")
+_STRUCTURAL_PREFIXES = ("class ",)
 
 EXERCISES: Dict[str, dict] = {}
 
